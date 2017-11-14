@@ -16,10 +16,14 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
         
         /// If horizontal flow, then the cells will be placed vertically first until it fits the current collectionView's height. If the cell doesn't fit, then it'll be moved to next column and same flow follows for remaining cells. If there is a new section, then the cell will be forced to the next column forcefully.
         case horizontal
+        
+        /// If centralized flow, then the cells will be placed centered and vertically and will be adjusted to accomodate as much as possible.
+        /// - Note: The cell's height for all the cell within a section has to be constant for this to look good.
+        case centralizedVertical
     }
     
     /// Set the required layout type from the defined set of types. Defaults to vertical
-    var layoutType: CollectionViewLayoutType = .horizontal
+    var layoutType: CollectionViewLayoutType = .centralizedVertical
     
     // Stored calculated attributes for caching purpose
     private var layoutAttributes: [UICollectionViewLayoutAttributes] = []
@@ -51,6 +55,7 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
         
         var startXPosition: CGFloat = 0
         var startYPosition: CGFloat = 0
+        var availableWidth: CGFloat = collectionView.bounds.size.width
         let adjustedCollectionViewHeight = collectionView.bounds.size.height - adjustedInsets
         
         for sectionIndex in stride(from: 0, to: collectionView.numberOfSections, by: 1) {
@@ -78,13 +83,12 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
             
             // Update content variables based on layout type
             switch layoutType {
-            case .vertical:
-                // If the section is changed, then set y position value as well
+            case .vertical, .centralizedVertical:
                 startYPosition += defaultSectionInsets.top
                 startXPosition = defaultSectionInsets.left
                 maxContentHeight += defaultSectionInsets.top
+                availableWidth -= (defaultSectionInsets.left + defaultSectionInsets.right)
             case .horizontal:
-                // If the section is changed, then set x position value as well
                 startXPosition += defaultSectionInsets.left
                 startYPosition = defaultSectionInsets.top
                 maxContentWidth += defaultSectionInsets.left
@@ -105,17 +109,53 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
                 
                 // Calculate the proper layout for each cases
                 switch layoutType {
-                case .vertical:
-                    // Check if the cell can be placed in the same row. If not, then increase Y position for height related values and update frame
-                    if (startXPosition + defaultInterItemSpacing + layoutAttribute.frame.size.width + defaultSectionInsets.right) <= collectionView.bounds.size.width {
-                        // Add spacing only if it's not a first cell
+                case .vertical, .centralizedVertical:
+                    if layoutType == .centralizedVertical {
+                        // Check if the cell can be placed in the same row. If not, then increase Y position for height related values and update frame
+                        availableWidth -= layoutAttribute.frame.size.width
+                        
+                        // Remove padding only if it's not a first cell
                         if itemIndex != 0 {
-                            startXPosition += defaultInterItemSpacing
+                            availableWidth -= defaultInterItemSpacing
+                        }
+                        
+                        if availableWidth >= 0 {
+                            // Loop through all attributes in reverse order to identify attribute that is in same row. Then reposition all attributes centered and place the current attribute again
+                            for attribute in layoutAttributes.reversed() {
+                                if attribute.frame.origin.y != startYPosition {
+                                    break
+                                }
+                                
+                                // Adjust the attribute that lie in same line so as to make it center aligned
+                                attribute.frame.origin.x -= (defaultInterItemSpacing + layoutAttribute.frame.size.width) / 2
+                            }
+                            
+                            // If not first index, then get X value of last attribute and add spacing to get next X position. Else get X position w.r.t collectionView width
+                            if itemIndex != 0 {
+                                startXPosition = layoutAttributes.last!.frame.maxX + defaultInterItemSpacing
+                            }
+                            else {
+                                startXPosition = (collectionView.bounds.size.width - layoutAttribute.frame.size.width) / 2
+                            }
+                        }
+                        else {
+                            // Move to next row and set necessary values
+                            availableWidth = collectionView.bounds.size.width - defaultSectionInsets.left - defaultSectionInsets.right - layoutAttribute.frame.size.width
+                            startXPosition = (collectionView.bounds.size.width - layoutAttribute.frame.size.width) / 2
+                            startYPosition = maxContentHeight + defaultLineSpacing
                         }
                     }
                     else {
-                        startXPosition = defaultSectionInsets.left
-                        startYPosition = maxContentHeight + defaultLineSpacing
+                        if (startXPosition + defaultInterItemSpacing + layoutAttribute.frame.size.width + defaultSectionInsets.right) <= collectionView.bounds.size.width {
+                            // Add spacing only if it's not a first cell
+                            if itemIndex != 0 {
+                                startXPosition += defaultInterItemSpacing
+                            }
+                        }
+                        else {
+                            startXPosition = defaultSectionInsets.left
+                            startYPosition = maxContentHeight + defaultLineSpacing
+                        }
                     }
                     
                     // Update frame origin
