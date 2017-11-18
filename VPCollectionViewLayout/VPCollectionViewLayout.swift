@@ -29,6 +29,12 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
     /// Set the required layout type from the defined set of types. Defaults to vertical
     var layoutType: CollectionViewLayoutType = .vertical
     
+    // This variable is used if a cell has to be expanded when selecting pushing other nearby cells maintaining the same spacing
+    private var selectedIndexPath: IndexPath?
+    
+    // This variable is used only if `selectedIndexPath` is set. This variable takes values by which the size has to be increased or decreased for the selected cell. The values should be in range between 0 (decrease to 0) to +ve (increase by any value)
+    private var selectedCellExpandPercentage: CGSize = CGSize(width: 1, height: 1)
+    
     // Stored calculated attributes for caching purpose
     private var layoutAttributes: [UICollectionViewLayoutAttributes] = []
     private var maxContentWidth: CGFloat = 0
@@ -41,6 +47,26 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
     
     override var collectionViewContentSize: CGSize {
         return CGSize(width: maxContentWidth, height: maxContentHeight)
+    }
+    
+    /// Call this method when selection of cell should expand the cell with/without animation
+    ///
+    /// - Parameters:
+    ///   - indexPath: the indexpath of the cell whose size has to be increased or decreased. If set to nil, the size will return to default size if there are any previously selected cells.
+    ///   - percentageIncrease: the size increase in percentage/100 format for the selected cell. If width and height are 1 & 1, then default size. If greater than 1, then it's increased size and vice-versa. Defaults to 1.25 each (125% of the current size).
+    ///   - shouldAnimate: optional bool variable to animate selection if needed. Defaults to `true`.
+    func didSelectCell(atIndexPath indexPath: IndexPath?, percentageIncrease: CGSize = CGSize(width: 1.25, height: 1.25), shouldAnimate: Bool = true) {
+        selectedIndexPath = indexPath
+        selectedCellExpandPercentage = percentageIncrease
+        
+        if shouldAnimate {
+            collectionView?.performBatchUpdates({ [weak self] in
+                self?.invalidateLayout()
+            }, completion: nil)
+        }
+        else {
+            invalidateLayout()
+        }
     }
     
     // Calculate the attributes when invalidating layout
@@ -109,7 +135,12 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
                     if delagteFlowLayout.responds(to: #selector(delagteFlowLayout.collectionView(_:layout:sizeForItemAt:))) {
                         let itemSize = delagteFlowLayout.collectionView!(collectionView, layout: self, sizeForItemAt: indexPath)
                         
-                        layoutAttribute.frame.size = itemSize
+                        if selectedIndexPath == indexPath {
+                            layoutAttribute.frame.size = CGSize(width: itemSize.width * selectedCellExpandPercentage.width, height: itemSize.height * selectedCellExpandPercentage.width)
+                        }
+                        else {
+                            layoutAttribute.frame.size = itemSize
+                        }
                     }
                 }
                 
