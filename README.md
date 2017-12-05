@@ -11,7 +11,7 @@ VPCollectionViewLayout is a helper class for displaying collection view cells in
 
 Drag and drop the folder `VPCollectionViewLayout` into your project. Add a collection view wherever needed in your xib or storyboard and change the flow layout class to custom and enter the name of the class as `VPCollectionViewLayout`.
 
-The currently supported layouts are - vertical, horizontal, centralizedVertical and centralizedHorizontal (more detail explanation mentioned within the class).
+The currently supported layouts are - vertical, horizontal, centralizedVertical, centralizedHorizontal and circular (more detail explanation mentioned within the class).
 
 
 # ![Screenshot](/Vertical.png)
@@ -19,6 +19,7 @@ The currently supported layouts are - vertical, horizontal, centralizedVertical 
 # ![Screenshot](/CentralizedVertical.png)
 # ![Screenshot](/CentralizedHorizontal.png)
 # ![Screenshot](/VerticalSelected.png)
+# ![Screenshot](/Circular.png)
 
 ## Contributing
 **Type - 1**
