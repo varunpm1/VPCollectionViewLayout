@@ -47,10 +47,17 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
         /// If centralized flow, then the cells will be placed centered and horizontally and will be adjusted to accomodate as much as possible.
         /// - Note: The cell's width for all the cell within a section has to be constant for this to look good.
         case centralizedHorizontal
+        
+        /// If circular flow, then the cells will be placed circularly and will be adjusted to accomodate as much as possible.
+        /// - Note: This will place the cell in round table format and doesn't rotate the cell itself. Also this layout assumes that all the cell's are of same size. Different sized cells are not supported.
+        case circular
     }
     
     /// Set the required layout type from the defined set of types. Defaults to vertical
-    var layoutType: CollectionViewLayoutType = .horizontal
+    var layoutType: CollectionViewLayoutType = .circular
+    
+    /// The radius to be used for circular layout. Defaults to 100
+    var circularRadius: CGFloat = 100
     
     // This variable is used if a cell has to be expanded when selecting pushing other nearby cells maintaining the same spacing
     private var selectedIndexPath: IndexPath?
@@ -111,6 +118,7 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
         var startYPosition: CGFloat = 0
         var availableWidth: CGFloat = collectionView.bounds.size.width
         var availableHeight: CGFloat = adjustedCollectionViewHeight
+        var angle: CGFloat = 0
         
         for sectionIndex in stride(from: 0, to: collectionView.numberOfSections, by: 1) {
             // Fetch the default values for spacing, if set
@@ -147,16 +155,19 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
                 startYPosition = defaultSectionInsets.top
                 maxContentWidth += defaultSectionInsets.left
                 availableHeight = (adjustedCollectionViewHeight - defaultSectionInsets.top - defaultSectionInsets.bottom)
+            case .circular:
+                angle = 2 * CGFloat.pi / CGFloat(collectionView.numberOfItems(inSection: sectionIndex))
             }
             
             for itemIndex in stride(from: 0, to: collectionView.numberOfItems(inSection: sectionIndex), by: 1) {
                 let indexPath = IndexPath(item: itemIndex, section: sectionIndex)
                 let layoutAttribute = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+                var itemSize: CGSize = CGSize.zero
                 
                 // Get the item size from the controller/view if the itemSize delegate has been implemented
                 if let delagteFlowLayout = collectionView.delegate as? UICollectionViewDelegateFlowLayout {
                     if delagteFlowLayout.responds(to: #selector(delagteFlowLayout.collectionView(_:layout:sizeForItemAt:))) {
-                        let itemSize = delagteFlowLayout.collectionView!(collectionView, layout: self, sizeForItemAt: indexPath)
+                        itemSize = delagteFlowLayout.collectionView!(collectionView, layout: self, sizeForItemAt: indexPath)
                         
                         if selectedIndexPath == indexPath {
                             layoutAttribute.frame.size = CGSize(width: itemSize.width * selectedCellExpandPercentage.width, height: itemSize.height * selectedCellExpandPercentage.width)
@@ -298,6 +309,21 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
                     
                     // Height doesn't increase here
                     maxContentHeight = adjustedCollectionViewHeight
+                case .circular:
+                    // Since max content width would be diameter of circle + left and right section insets + cell's size (left and right cell will be clipped to half since placed at center)
+                    maxContentWidth = 2 * circularRadius + layoutAttribute.frame.size.width + defaultSectionInsets.left + defaultSectionInsets.right
+                    
+                    // Since max content height would be diameter of circle + top and bottom section insets + cell's size (top and bottom cell will be clipped to half since placed at center)
+                    maxContentHeight = 2 * circularRadius + layoutAttribute.frame.size.height + defaultSectionInsets.top + defaultSectionInsets.bottom
+                    
+                    // If the selected index path is the same as the current index path, then the cell is expanded. So get the increased size to calculate padding
+                    let increasedPaddingSize: CGSize = CGSize(width: (layoutAttribute.frame.size.width - itemSize.width) / 2, height: (layoutAttribute.frame.size.height - itemSize.height) / 2)
+                    
+                    // Calculate the position for the layout attribute
+                    let actualAngle = CGFloat(itemIndex) * angle
+                    let xPositionPadding = circularRadius + defaultSectionInsets.left - increasedPaddingSize.width
+                    let yPositionPadding = circularRadius + defaultSectionInsets.top - increasedPaddingSize.height
+                    layoutAttribute.frame.origin = CGPoint(x: xPositionPadding + circularRadius * cos(actualAngle), y: yPositionPadding + circularRadius * sin(actualAngle))
                 }
                 
                 layoutAttributes.append(layoutAttribute)

@@ -4,6 +4,7 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -34,6 +35,9 @@
                 <constraint firstItem="5SW-KO-DhI" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="wgd-6n-71m"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <connections>
+                <outlet property="cellTitleLabel" destination="5SW-KO-DhI" id="qtf-Jb-1HW"/>
+            </connections>
         </collectionViewCell>
     </objects>
 </document>
