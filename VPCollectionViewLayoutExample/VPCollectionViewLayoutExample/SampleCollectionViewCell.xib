@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -19,7 +19,10 @@
                 <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5SW-KO-DhI">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="k1C-If-VMi">
+                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5SW-KO-DhI">
                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
@@ -30,12 +33,17 @@
             <color key="backgroundColor" red="0.92549019610000005" green="0.0" blue="0.19215686269999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="5SW-KO-DhI" secondAttribute="trailing" id="8fR-Wr-Yd6"/>
+                <constraint firstItem="k1C-If-VMi" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="8mQ-eg-ilF"/>
+                <constraint firstItem="k1C-If-VMi" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="CFc-dv-5Ra"/>
+                <constraint firstAttribute="bottom" secondItem="k1C-If-VMi" secondAttribute="bottom" id="Kao-2y-G1o"/>
                 <constraint firstItem="5SW-KO-DhI" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="a9y-xP-oqs"/>
                 <constraint firstAttribute="bottom" secondItem="5SW-KO-DhI" secondAttribute="bottom" id="k7h-6G-nNg"/>
+                <constraint firstAttribute="trailing" secondItem="k1C-If-VMi" secondAttribute="trailing" id="nw3-M3-WNB"/>
                 <constraint firstItem="5SW-KO-DhI" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="wgd-6n-71m"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <connections>
+                <outlet property="cellImageView" destination="k1C-If-VMi" id="goh-r9-5Bc"/>
                 <outlet property="cellTitleLabel" destination="5SW-KO-DhI" id="qtf-Jb-1HW"/>
             </connections>
         </collectionViewCell>

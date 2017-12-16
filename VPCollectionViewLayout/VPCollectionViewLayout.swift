@@ -54,7 +54,7 @@ class VPCollectionViewLayout: UICollectionViewFlowLayout {
     }
     
     /// Set the required layout type from the defined set of types. Defaults to vertical
-    var layoutType: CollectionViewLayoutType = .circular
+    var layoutType: CollectionViewLayoutType = .vertical
     
     /// The radius to be used for circular layout. Defaults to 100
     var circularRadius: CGFloat = 100

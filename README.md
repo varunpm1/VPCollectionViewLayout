@@ -38,6 +38,14 @@ The currently supported layouts are - vertical, horizontal, centralizedVertical,
 
 ## History
 
+### Version 0.2.1
+
+Added sample images and set default layout to be vertical
+
+### Version 0.2.0
+
+Added support for circular flow layout
+
 ### Version 0.1.0
 
 Added support for 4 types of flow layout display as well as selection animation handled with animation.
